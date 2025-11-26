@@ -2,294 +2,167 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Camera & Mic Permission Test</title>
+  <title>Camera & Mic Permissions Demo</title>
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-
     body {
-      margin: 0;
-      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      padding: 30px;
       display: flex;
-      align-items: center;
       justify-content: center;
-      background: #f4f4f8;
     }
 
-    .card {
-      width: 420px;
-      max-width: 90vw;
-      background: #ffffff;
-      border-radius: 16px;
-      padding: 24px 24px 20px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    #app {
+      width: 450px;
+      background: #fff;
+      padding: 25px;
+      border-radius: 14px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
     }
 
-    h1 {
-      margin: 0 0 8px;
-      font-size: 20px;
-    }
-
-    p {
-      margin: 4px 0;
-      color: #555;
-      font-size: 14px;
-      line-height: 1.5;
+    h2 {
+      margin-bottom: 6px;
     }
 
     .status {
-      margin-top: 12px;
-      padding: 10px 12px;
+      padding: 12px;
       border-radius: 8px;
-      font-size: 13px;
+      margin: 12px 0;
+      font-size: 14px;
       display: none;
     }
 
-    .status.visible {
-      display: block;
-    }
-
-    .status.info {
-      background: #e8f1ff;
-      color: #234394;
-    }
-
-    .status.success {
-      background: #e6f7e9;
-      color: #216334;
-    }
-
-    .status.error {
-      background: #ffe8e8;
-      color: #8a1f1f;
-    }
-
-    .btn-row {
-      margin-top: 18px;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+    .status.visible { display: block; }
+    .status.success { background: #e9ffe9; color: #0b6123; }
+    .status.error { background: #ffe8e8; color: #7a1313; }
+    .status.info { background: #e8f0ff; color: #234394; }
 
     button {
-      border-radius: 999px;
+      padding: 12px 18px;
       border: none;
-      padding: 10px 18px;
-      font-size: 14px;
-      cursor: pointer;
-      transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.2s ease;
-    }
-
-    button.primary {
       background: #0066ff;
-      color: #fff;
-      box-shadow: 0 3px 10px rgba(0, 102, 255, 0.4);
-    }
-
-    button.primary:hover {
-      background: #0052cc;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(0, 82, 204, 0.5);
-    }
-
-    button.secondary {
-      background: #f0f0f3;
-      color: #333;
-    }
-
-    button.secondary:hover {
-      background: #e2e2e7;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+      font-size: 14px;
+      width: 100%;
     }
 
     button:disabled {
-      opacity: 0.6;
+      opacity: .6;
       cursor: default;
-      transform: none;
-      box-shadow: none;
     }
 
-    .video-preview {
-      margin-top: 16px;
-      border-radius: 12px;
-      overflow: hidden;
-      display: none;
-      background: #000;
-    }
-
-    .video-preview video {
+    video {
       width: 100%;
-      height: 240px;
-      object-fit: cover;
+      margin-top: 15px;
+      border-radius: 10px;
+      display: none;
     }
 
-    .hint {
-      margin-top: 10px;
-      font-size: 12px;
-      color: #777;
-    }
-
-    .hint code {
-      background: #f2f2f6;
-      padding: 1px 5px;
-      border-radius: 4px;
-      font-size: 12px;
-    }
-
-    .permission-state {
-      margin-top: 8px;
-      font-size: 12px;
-      color: #666;
-    }
-
-    .permission-state span {
-      font-weight: 600;
+    .fix-box {
+      padding: 12px;
+      background: #fff4d9;
+      border-left: 5px solid #ff9900;
+      margin-top: 15px;
+      border-radius: 8px;
+      display: none;
     }
   </style>
 </head>
+
 <body>
-  <div class="card">
-    <h1>Test Camera & Mic Permissions</h1>
-    <p>
-      Click the button below and Chrome should show its native popup with
-      options like <b>"Allow while using this site"</b> and <b>"Not allow"</b>.
-    </p>
+  <div id="app">
+    <h2>Camera & Mic Permission Test</h2>
+    <p>This demo shows exactly how Chrome behaves with Allow, Deny, and Block states.</p>
 
-    <div class="permission-state" id="permissionState">
-      Checking current permission state…
+    <div id="status" class="status info visible">
+      Click the button below to request camera & mic permissions.
     </div>
 
-    <div class="status info visible" id="statusBox">
-      Ready. Click "Request camera & mic" to trigger the permission prompt.
+    <button id="requestBtn">Request Camera & Mic</button>
+
+    <video id="video" autoplay playsinline muted></video>
+
+    <div class="fix-box" id="fixBox">
+      <b>Permissions are blocked!</b><br /><br />
+      Chrome has blocked camera/mic access for this site.<br /><br />
+      <b>How to fix:</b>
+      <ol>
+        <li>Click the <b>🔒 lock icon</b> in the address bar.</li>
+        <li>Go to <b>Site settings</b>.</li>
+        <li>Set <b>Camera = Allow</b> and <b>Microphone = Allow</b>.</li>
+        <li>Reload this page.</li>
+      </ol>
     </div>
 
-    <div class="btn-row">
-      <button class="primary" id="requestBtn">
-        Request camera &amp; mic
-      </button>
-      <button class="secondary" id="stopBtn" disabled>
-        Stop stream
-      </button>
-      <button class="secondary" id="recheckBtn">
-        Re-check permission state
-      </button>
-    </div>
-
-    <div class="video-preview" id="videoContainer">
-      <video id="video" autoplay muted playsinline></video>
-    </div>
-
-    <div class="hint">
-      Tips:
-      <ul style="margin: 6px 0 0 18px; padding: 0;">
-        <li>Test on <code>https://</code> or <code>http://localhost</code>.</li>
-        <li>If you clicked "Not allow", use the lock icon → Site settings → reset permissions.</li>
-      </ul>
-    </div>
   </div>
 
-  <script>
-    const requestBtn = document.getElementById("requestBtn");
-    const stopBtn = document.getElementById("stopBtn");
-    const recheckBtn = document.getElementById("recheckBtn");
-    const statusBox = document.getElementById("statusBox");
-    const permissionStateEl = document.getElementById("permissionState");
-    const video = document.getElementById("video");
-    const videoContainer = document.getElementById("videoContainer");
+<script>
+  const requestBtn = document.getElementById("requestBtn");
+  const statusBox = document.getElementById("status");
+  const video = document.getElementById("video");
+  const fixBox = document.getElementById("fixBox");
 
-    let currentStream = null;
+  function showStatus(msg, type="info") {
+    statusBox.textContent = msg;
+    statusBox.className = "status visible " + type;
+  }
 
-    function setStatus(message, type = "info") {
-      statusBox.textContent = message;
-      statusBox.classList.remove("info", "success", "error");
-      statusBox.classList.add(type, "visible");
+  async function checkPermissions() {
+    if (!navigator.permissions) return null;
+
+    try {
+      const cam = await navigator.permissions.query({ name: 'camera' });
+      const mic = await navigator.permissions.query({ name: 'microphone' });
+      return { cam: cam.state, mic: mic.state };
+    } catch (e) {
+      return null;
     }
+  }
 
-    function setPermissionStateText(text) {
-      permissionStateEl.innerHTML = "Permission state: <span>" + text + "</span>";
-    }
+  async function askPermission() {
+    showStatus("Requesting camera & mic… Chrome may show the permission popup", "info");
 
-    function stopStream() {
-      if (currentStream) {
-        currentStream.getTracks().forEach((t) => t.stop());
-        currentStream = null;
-      }
-      video.srcObject = null;
-      videoContainer.style.display = "none";
-      stopBtn.disabled = true;
-    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
 
-    async function checkPermissions() {
-      if (!navigator.permissions) {
-        setPermissionStateText("Permissions API not supported in this browser.");
+      // SUCCESS
+      showStatus("Permissions granted! Camera stream active.", "success");
+      video.srcObject = stream;
+      video.style.display = "block";
+      fixBox.style.display = "none";
+
+    } catch (err) {
+      console.warn("Permission Error:", err);
+
+      const perm = await checkPermissions();
+
+      // CASE: User clicked BLOCK (persistent deny)
+      if (perm && (perm.cam === "denied" || perm.mic === "denied")) {
+        showStatus("Permissions are BLOCKED. Browser will NOT show popup again.", "error");
+        fixBox.style.display = "block";
+        video.style.display = "none";
         return;
       }
 
-      try {
-        const micStatus = await navigator.permissions.query({ name: "microphone" });
-        const camStatus = await navigator.permissions.query({ name: "camera" });
-        setPermissionStateText(
-          `mic: ${micStatus.state}, camera: ${camStatus.state}`
-        );
-      } catch (err) {
-        console.error("Error checking permissions:", err);
-        setPermissionStateText("Could not read permission state.");
+      // CASE: Temporary "Not now" or close popup
+      if (err.name === "NotAllowedError") {
+        showStatus("Permission denied temporarily. Try again.", "error");
+        fixBox.style.display = "none";
+        return;
       }
+
+      showStatus("Error: " + err.message, "error");
     }
+  }
 
-    async function requestMedia() {
-      setStatus("Requesting camera & mic… the browser should now show a permission popup.", "info");
-      requestBtn.disabled = true;
+  requestBtn.addEventListener("click", askPermission);
+</script>
 
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-          video: true,
-        });
-
-        // SUCCESS
-        currentStream = stream;
-        video.srcObject = stream;
-        videoContainer.style.display = "block";
-        stopBtn.disabled = false;
-
-        setStatus("Permissions granted! You should see your camera preview.", "success");
-      } catch (err) {
-        console.error("getUserMedia error:", err);
-
-        if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
-          setStatus(
-            "Permission denied. Click the lock icon in the address bar → Site settings → Allow camera & mic, then reload and try again.",
-            "error"
-          );
-        } else if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
-          setStatus(
-            "No camera or microphone was found. Check your hardware and try again.",
-            "error"
-          );
-        } else {
-          setStatus("Error accessing media devices: " + err.message, "error");
-        }
-      } finally {
-        requestBtn.disabled = false;
-        checkPermissions();
-      }
-    }
-
-    // Event listeners
-    requestBtn.addEventListener("click", requestMedia);
-    stopBtn.addEventListener("click", () => {
-      stopStream();
-      setStatus("Stream stopped. You can request again.", "info");
-    });
-    recheckBtn.addEventListener("click", () => {
-      checkPermissions();
-      setStatus("Re-checked permission state.", "info");
-    });
-
-    // On load
-    checkPermissions();
-  </script>
 </body>
 </html>
